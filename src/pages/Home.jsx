@@ -1,0 +1,117 @@
+import { useState, useEffect } from 'react'
+import '../css/Home.css'
+
+function App() {
+  const [name, setName] = useState('');
+  const [amount, setAmount] = useState('');
+  const [date, setDate] = useState('');
+  const [description, setDescription] = useState('');
+  const [category, setCategory] = useState('');
+  const [method, setMethod] = useState('');
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    getRecentTransactions().then(setTransactions);
+  }, []);
+
+  async function getRecentTransactions(){
+    const url = import.meta.env.VITE_API_URL+'/transactions/recent';
+    const response = await fetch(url);
+    return await response.json();
+  }
+
+  async function addNewTransaction(ev){
+    ev.preventDefault();
+
+    if (!name || !amount){
+      alert('Please fill in all the * marked details');
+      return;
+    }
+    
+    const currentDate = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
+    const transactionDate = date?.trim() || currentDate;
+    
+    console.log({name, amount, description, date:transactionDate});
+    
+    const response = await fetch(import.meta.env.VITE_API_URL+'/transaction', {
+      method: 'POST',
+      headers: {'Content-type':'application/json'},
+      body: JSON.stringify({ name, amount, description, date: transactionDate }),
+    });
+  
+    const json = await response.json();
+    setName('');
+    setAmount('');
+    setDescription('');
+    setDate('');
+    setTransactions(prev => [...prev, json]);
+  }
+
+
+  let balance = 0;
+  for (const transaction of transactions){
+    balance = balance + transaction.amount;
+  }
+
+  balance = balance.toFixed(2);
+  const fraction = balance.split('.')[1];
+  balance = balance.split('.')[0];
+  return (
+    <main>
+      <h1>Rs. {balance}<span>.{fraction}</span></h1>
+      <h3>Add new transaction</h3>
+      <form onSubmit={addNewTransaction}>
+        <div className='amount'>
+          <input type="number"
+                  value={amount}
+                  onChange={ev =>setAmount(ev.target.value)}
+                  placeholder ='*Amount'/>
+        </div>
+        <div className='basic'>
+        <input type="Text" 
+               value={name}
+               onChange={ev => setName(ev.target.value)}
+              placeholder='*Title'/>
+        <input type="date"
+                value={date}
+                onChange={ev => setDate(ev.target.value)}/>
+        </div>
+        <div className='description'>
+        <input type='text' 
+                value={description}
+                onChange={ev => setDescription(ev.target.value)}
+                placeholder='Comments'/>
+        </div>
+        <button type='submit'
+                /* disabled={!name || !amount}*/>
+                  Add New Transaction
+        </button>
+      </form>
+      <h3>Recent transactions</h3>
+      <div className='transactions'>
+        {transactions.length > 0 && transactions
+          .sort((a, b) => new Date(b.date) - new Date(a.date))
+          .slice(0,10)
+          .map(transaction => (
+          <div key={transaction._id} className='transaction'>
+          <div className='left'>
+            <div className='name'>{transaction.name}</div>
+            <div className='description'>{transaction.description}</div>
+          </div>
+          <div className='right'>
+            <div className={'price '+(transaction.amount<0?'red':'green')}>{transaction.amount}</div>
+            <div className='date'>
+                {new Date(transaction.date).toLocaleDateString('en-IN', {
+                          day: '2-digit', month: 'short', year: 'numeric'
+                })}
+            </div>
+          </div>
+        </div>
+        ))}
+      </div>
+
+    </main>
+  )
+}
+
+export default App;

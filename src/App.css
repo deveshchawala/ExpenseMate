@@ -1,0 +1,111 @@
+*{
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+body{
+  background-color:  #17181F;
+  color: #ddd;
+}
+
+main{
+  max-width: 400px;
+  margin: 30px auto;
+}
+
+h1{
+  text-align: center;
+  color: #fff;
+  margin: 0;
+  font-size: 2.5rem;
+}
+h1 span{
+  font-size: 1rem;
+  display: inline-block;
+  margin-top: 6px;
+}
+h3{
+  text-align: center;
+  color: grey;
+  margin: 2;
+  font-size: 1rem;
+  border-top: 1px dashed #888;
+}
+
+div.addNewAddNewLabel{
+  
+  text-align: center;
+}
+
+form{
+  margin-top: 20px;
+}
+
+form input{
+  width: 100%;
+  background-color: transparent;
+  color: #ddd;
+  border: 2px solid #30313d;
+  padding: 2px 5px;
+  border-radius: 5px;
+}
+
+form input[type="date"]{
+  color: #777;
+}
+
+form div.basic{
+  display: flex;
+  gap: 5px;
+}
+
+form button{
+  width: 100%;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 5px;
+  background-color: #ddd;
+  color: #17181F;
+  padding: 5px;
+}
+
+div.transactions{
+  margin-top: 15px;
+
+}
+
+div.transaction{
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-top: 1px dashed #888;
+}
+
+div.transaction:first-child{
+  border-top: 0;
+}
+
+div.transaction div.name{
+  font-size:  1.2rem;
+
+}
+div.trasaction div.description{
+  font-size: 0.7rem;
+  color: #888;
+}
+
+div.right{
+  text-align: right;
+}
+
+div.price.green{
+  color:#1c1;
+}
+
+div.price.red{
+  color: #c11;
+}
+
+div.trasaction div.date{
+  font-size: 0.7rem;
+}
