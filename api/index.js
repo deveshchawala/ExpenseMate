@@ -25,8 +25,8 @@ app.get('/api/test', (req, res) => {
 
 app.post('/api/transaction', async (req, res) => {
     try{
-    const { name, amount, description, date } = req.body; 
-    const transaction = await Transaction.create({name, amount, description, date});
+    const { name, amount, description, date, category, method } = req.body; 
+    const transaction = await Transaction.create({name, amount, description, date, category, method});
     res.json(transaction);
     }
     catch (error){
@@ -48,6 +48,16 @@ app.get('/api/transactions/recent', async (req, res) => {
         res.json(transactions);
     } catch (error) {
         console.log('Error in fetching recent transactions:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/api/categories', async (req, res) => {
+    try {
+        const categories = await Transaction.distinct('category'); // Fetch unique categories
+        res.json(categories);
+    } catch (error) {
+        console.log('Error in fetching categories:', error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });

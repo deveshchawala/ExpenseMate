@@ -6,12 +6,13 @@ function App() {
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
   const [description, setDescription] = useState('');
-  const [category, setCategory] = useState('');
-  const [method, setMethod] = useState('');
+  const [category, setCategory] = useState([]);
+  const [method, setMethod] = useState([]);
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     getRecentTransactions().then(setTransactions);
+    fetchCategories().then(setCategory);
   }, []);
 
   async function getRecentTransactions(){
@@ -20,10 +21,15 @@ function App() {
     return await response.json();
   }
 
+    async function fetchCategories(){
+        const url = import.meta.env.VITE_API_URL+'/categories';
+        const response = await fetch(url);  
+        return await response.json();
+    }
   async function addNewTransaction(ev){
     ev.preventDefault();
 
-    if (!name || !amount){
+    if (!name || !amount || !category``){
       alert('Please fill in all the * marked details');
       return;
     }
@@ -31,12 +37,12 @@ function App() {
     const currentDate = new Date().toISOString().split('T')[0]; // 'YYYY-MM-DD'
     const transactionDate = date?.trim() || currentDate;
     
-    console.log({name, amount, description, date:transactionDate});
+    console.log({name, amount, description, date:transactionDate, method, category});
     
     const response = await fetch(import.meta.env.VITE_API_URL+'/transaction', {
       method: 'POST',
       headers: {'Content-type':'application/json'},
-      body: JSON.stringify({ name, amount, description, date: transactionDate }),
+      body: JSON.stringify({ name, amount, description, date: transactionDate, method,category }),
     });
   
     const json = await response.json();
@@ -44,6 +50,8 @@ function App() {
     setAmount('');
     setDescription('');
     setDate('');
+    setCategory('');
+    setMethod('');
     setTransactions(prev => [...prev, json]);
   }
 
@@ -58,7 +66,7 @@ function App() {
   balance = balance.split('.')[0];
   return (
     <main>
-      <h1>Rs. {balance}<span>.{fraction}</span></h1>
+      <h1>₹ {balance}<span>.{fraction}</span></h1>
       <h3>Add new transaction</h3>
       <form onSubmit={addNewTransaction}>
         <div className='amount'>
@@ -75,6 +83,14 @@ function App() {
         <input type="date"
                 value={date}
                 onChange={ev => setDate(ev.target.value)}/>
+        </div>
+        <div className='category'>
+            <select value={category} onChange={ev => setCategory(ev.target.value)}>
+                <option value=''>*Select Category</option>
+                {category.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                ))}
+            </select>
         </div>
         <div className='description'>
         <input type='text' 
