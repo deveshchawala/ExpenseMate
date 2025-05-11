@@ -4,6 +4,7 @@ import '../css/Home.css'
 
 
 function App() {
+  const [balance, setBalance] = useState(0);
   const [name, setName] = useState('');
   const [amount, setAmount] = useState('');
   const [date, setDate] = useState('');
@@ -15,10 +16,19 @@ function App() {
   const [methodList, setMethodList] = useState([]);
 
   useEffect(() => {
+    fetchBalance().then(setBalance);
     getRecentTransactions().then(setTransactions);
     fetchCategories();
     fetchMethods();
   }, []);
+
+  async function fetchBalance() {
+    const url = import.meta.env.VITE_API_URL + '/balance';
+    const response = await fetch(url);
+    const data = await response.json();
+    console.log('Fetched balance:', data);
+    return data.balance;
+  }
 
   async function getRecentTransactions(){
     const url = import.meta.env.VITE_API_URL+'/transactions/recent';
@@ -37,7 +47,6 @@ function App() {
     const url = import.meta.env.VITE_API_URL + '/methods';
     const response = await fetch(url);
     const data = await response.json();
-    console.log('Fetched methods:', data);
     setMethodList(data); 
   }
   async function addNewTransaction(ev){
@@ -67,21 +76,13 @@ function App() {
     setCategory('');
     setMethod('');
     setTransactions(prev => [...prev, json]);
+    fetchBalance().then(setBalance);
   }
 
-
-  let balance = 0;
-  for (const transaction of transactions){
-    balance = balance + transaction.amount;
-  }
-
-  balance = balance.toFixed(2);
-  const fraction = balance.split('.')[1];
-  balance = balance.split('.')[0];
-  
   return (
     <main>
-      <h1>₹ {balance}<span>.{fraction}</span></h1>
+      {/* <h1>₹ {balance}<span>.{fraction}</span></h1> */}
+      <h1>₹ {balance}</h1>
       <h3>Add new transaction</h3>
       <form onSubmit={addNewTransaction}>
         <div className='amount'>

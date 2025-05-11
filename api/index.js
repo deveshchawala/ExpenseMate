@@ -25,6 +25,33 @@ app.get('/api/test', (req, res) => {
     res.json('test ok');
 });
 
+// For custom date range, use the following format in the URL:
+// GET /api/balance?startDate=2025-04-01&endDate=2025-04-30
+app.get('/api/balance', async (req, res) => {
+    try{
+        const {startDate, endDate} = req.query;
+
+        const currentDate = new Date();
+        const defaultStartDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+        const defaultEndDate = new Date(currentDate.getFullYear(), currentDate.getMonth()+1, 0);
+
+        const start = startDate ? new Date(startDate) : defaultStartDate;
+        const end = endDate ? new Date(endDate) : defaultEndDate;
+         
+        const transactions = await Transaction.find({
+            date: { $gte:start, $lte:end,},
+        });
+
+        const balance = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+        res.json({balance: balance.toFixed(2), startDate:start, endDate:end});
+
+    } catch (error) {
+        console.log('Error in fetching balance:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 app.post('/api/transaction', async (req, res) => {
     try{
     const { name, amount, description, date, category, method } = req.body; 
