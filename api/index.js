@@ -4,6 +4,8 @@ import {Client} from "pg";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose'; 
 import Transaction from './models/Transaction.js'; 
+import Category from './models/Category.js';
+import Method from './models/Method.js';
 
 dotenv.config(); // Initialize dotenv
 
@@ -54,7 +56,17 @@ app.get('/api/transactions/recent', async (req, res) => {
 
 app.get('/api/categories', async (req, res) => {
     try {
-        const categories = await Transaction.distinct('category'); // Fetch unique categories
+        const categories = await Category.distinct('category'); // Fetch unique categories
+        res.json(categories);
+    } catch (error) {
+        console.log('Error in fetching categories:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+app.get('/api/methods', async (req, res) => {
+    try {
+        const categories = await Method.distinct('method'); // Fetch unique categories
         res.json(categories);
     } catch (error) {
         console.log('Error in fetching categories:', error);

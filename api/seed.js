@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import Transaction from './models/Transaction.js';
+import Category from './models/Category.js';
+import Method from './models/Method.js';
 
 dotenv.config();
 
@@ -28,7 +29,7 @@ async function seedData() {
   
       // Insert default categories if they don't already exist
       for (const category of categories) {
-        await Transaction.updateOne(
+        await Category.updateOne(
           { category: category.category }, // Check if the category exists
           { $setOnInsert: category }, // Insert only if it doesn't exist
           { upsert: true } // Perform upsert
@@ -38,7 +39,7 @@ async function seedData() {
   
       // Insert default methods if they don't already exist
       for (const method of methods) {
-        await Transaction.updateOne(
+        await Method.updateOne(
           { method: method.method }, // Check if the method exists
           { $setOnInsert: method }, // Insert only if it doesn't exist
           { upsert: true } // Perform upsert
